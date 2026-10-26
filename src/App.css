@@ -1,0 +1,411 @@
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 36px 24px;
+  color: #e2e8f0;
+}
+
+.game-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  color: #a78bfa;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.game-header h1 {
+  margin: 8px 0;
+  font-size: clamp(36px, 6vw, 58px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  background: linear-gradient(90deg, #c4b5fd, #60a5fa);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  color: #94a3b8;
+}
+
+.game-area {
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 20px 60px #00000030;
+}
+
+.scene-heading {
+  text-align: center;
+}
+
+.scene-heading h2 {
+  margin-bottom: 8px;
+  font-size: 24px;
+}
+
+.scene-heading p,
+.floor-placeholder p {
+  color: #94a3b8;
+}
+
+.building-scene {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.building-scene svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.building-scene g[role="button"]:hover polygon {
+  filter: brightness(1.15);
+}
+
+.building-scene g[role="button"]:focus-visible {
+  outline: none;
+  filter: drop-shadow(0 0 5px #c4b5fd);
+}
+
+.floor-placeholder {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.floor-icon {
+  font-size: 64px;
+}
+
+.floor-placeholder h3 {
+  font-size: 28px;
+}
+
+.floor-placeholder button {
+  margin-top: 16px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 12px;
+  background: #8b5cf6;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.floor-placeholder button:hover {
+  background: #7c3aed;
+}
+
+.game-footer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 24px 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding: 24px 12px;
+  }
+
+  .game-area {
+    padding: 12px;
+  }
+
+  .game-footer {
+    gap: 12px;
+    font-size: 12px;
+  }
+}
+
+
+.back-button {
+  padding: 10px 14px;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  background: #1e293b;
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background: #334155;
+}
+
+.floor-title {
+  margin: 24px 0;
+  text-align: center;
+}
+
+.floor-title h2 {
+  margin: 8px 0;
+  font-size: 36px;
+}
+
+.floor-title > p:last-child {
+  color: #94a3b8;
+}
+
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 650px;
+  margin: 28px auto;
+}
+
+.room-card {
+  display: flex;
+  min-height: 160px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid #475569;
+  border-radius: 18px;
+  background: #1e293b;
+  color: #e2e8f0;
+  text-align: center;
+}
+
+.room-card.unlocked {
+  border-color: #8b5cf6;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.room-card.unlocked:hover {
+  transform: translateY(-4px);
+  background: #312e81;
+}
+
+.room-card.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.room-card.completed {
+  border-color: #34d399;
+  background: #064e3b;
+}
+
+.room-icon {
+  font-size: 30px;
+}
+
+.room-name {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.room-status {
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+@media (max-width: 450px) {
+  .room-grid {
+    gap: 10px;
+  }
+
+  .room-card {
+    min-height: 145px;
+    padding: 12px 8px;
+  }
+
+  .room-status {
+    font-size: 11px;
+  }
+}
+
+
+.challenge-heading {
+  text-align: center;
+  margin: 24px 0;
+}
+
+.challenge-heading h2 {
+  font-size: clamp(28px, 5vw, 40px);
+  margin: 8px 0;
+}
+
+.challenge-heading > p:last-child {
+  color: #94a3b8;
+}
+
+.challenge-stats {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+  padding: 16px 24px;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  background: #0f172a;
+}
+
+.stat-label {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.stat-card strong {
+  font-size: 28px;
+}
+
+.timer-danger {
+  color: #fb7185;
+}
+
+.bubble-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 650px;
+  margin: 36px auto 24px;
+}
+
+.math-bubble {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px solid #a78bfa;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #818cf8, #4338ca 70%);
+  color: white;
+  box-shadow: 0 8px 25px #6366f140;
+  cursor: pointer;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.math-bubble:hover:not(:disabled) {
+  transform: translateY(-5px) scale(1.03);
+  filter: brightness(1.15);
+}
+
+.math-bubble:focus-visible {
+  outline: 3px solid #fef08a;
+  outline-offset: 4px;
+}
+
+.math-bubble:disabled {
+  cursor: default;
+}
+
+.bubble-expression {
+  font-size: clamp(15px, 2.5vw, 24px);
+  font-weight: 900;
+}
+
+.bubble-selected {
+  opacity: 0.45;
+  border-color: #34d399;
+  background: #065f46;
+}
+
+.bubble-wrong {
+  opacity: 1;
+  border-color: #fb7185;
+  background: #be123c;
+}
+
+.bubble-correct {
+  opacity: 1;
+  border-color: #6ee7b7;
+  background: #047857;
+  box-shadow: 0 0 30px #34d39970;
+}
+
+.bubble-check {
+  font-size: 16px;
+}
+
+.challenge-hint,
+.challenge-message {
+  text-align: center;
+  color: #c4b5fd;
+  margin: 20px 0;
+}
+
+.challenge-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 36px 16px;
+}
+
+.result-icon {
+  font-size: 64px;
+}
+
+.challenge-result h3 {
+  font-size: 30px;
+  margin: 0;
+}
+
+.challenge-result p {
+  color: #cbd5e1;
+}
+
+.primary-button {
+  padding: 13px 24px;
+  border: 0;
+  border-radius: 12px;
+  background: #8b5cf6;
+  color: white;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #7c3aed;
+}
+
+@media (max-width: 500px) {
+  .bubble-grid {
+    gap: 8px;
+  }
+
+  .stat-card {
+    min-width: 100px;
+    padding: 12px;
+  }
+}
