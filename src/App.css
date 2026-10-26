@@ -409,3 +409,9 @@
     padding: 12px;
   }
 }
+
+.boss-label {
+  color: #fbbf24;
+  font-weight: 800;
+  letter-spacing: 2px;
+}

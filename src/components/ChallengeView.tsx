@@ -1,8 +1,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  ROUND_SIZE,
-  TOTAL_ROUNDS,
   createChallenge,
   failOnTimeout,
   finishFailureFeedback,
@@ -13,6 +11,7 @@ import {
   generateRound,
   type MathExpression,
 } from "../game/expressionGenerator";
+import { getRoomConfig } from "../game/roomConfig";
 
 interface ChallengeViewProps {
   floor: number;
@@ -21,21 +20,61 @@ interface ChallengeViewProps {
   onExit: () => void;
 }
 
-function createFreshRound(): MathExpression[] {
-  return generateRound();
-}
-
 export default function ChallengeView({
   floor,
   room,
   onComplete,
   onExit,
 }: ChallengeViewProps) {
+  const config = getRoomConfig(floor, room);
+
+  if (!config) {
+    return (
+      <section className="challenge-view">
+        <h2>Room not found</h2>
+        <button className="back-button" onClick={onExit}>
+          ← Back to rooms
+        </button>
+      </section>
+    );
+  }
+
+  return (
+    <ActiveChallenge
+      key={`${floor}-${room}`}
+      floor={floor}
+      room={room}
+      config={config}
+      onComplete={onComplete}
+      onExit={onExit}
+    />
+  );
+}
+
+interface ActiveChallengeProps extends ChallengeViewProps {
+  config: NonNullable<ReturnType<typeof getRoomConfig>>;
+}
+
+function ActiveChallenge({
+  floor,
+  room,
+  config,
+  onComplete,
+  onExit,
+}: ActiveChallengeProps) {
+  function createFreshRound(): MathExpression[] {
+    return generateRound(config.difficulty);
+  }
+
   const [challenge, setChallenge] = useState<ChallengeState>(() =>
-    createChallenge(createFreshRound()),
+    createChallenge(
+      createFreshRound(),
+      config.totalRounds,
+      config.startingLives,
+    ),
   );
 
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(config.timeLimitSeconds);
 
   useEffect(() => {
     if (challenge.status !== "playing") return;
@@ -80,14 +119,14 @@ export default function ChallengeView({
       (bubble) => bubble.id === bubbleId,
     );
 
-    const isCorrect = clicked?.id === expected?.id;
+    if (!clicked || !expected) return;
 
     let nextRound: MathExpression[] | undefined;
 
     if (
-      isCorrect &&
-      challenge.selectedIds.length === ROUND_SIZE - 1 &&
-      challenge.roundIndex < TOTAL_ROUNDS - 1
+      clicked.id === expected.id &&
+      challenge.selectedIds.length === 2 &&
+      challenge.roundIndex < challenge.totalRounds - 1
     ) {
       nextRound = createFreshRound();
     }
@@ -98,8 +137,14 @@ export default function ChallengeView({
   }
 
   function retryChallenge() {
-    setChallenge(createChallenge(createFreshRound()));
-    setTimeLeft(30);
+    setChallenge(
+      createChallenge(
+        createFreshRound(),
+        config.totalRounds,
+        config.startingLives,
+      ),
+    );
+    setTimeLeft(config.timeLimitSeconds);
   }
 
   return (
@@ -112,8 +157,11 @@ export default function ChallengeView({
         <p className="eyebrow">
           FLOOR {floor} · ROOM {room}
         </p>
-        <h2>Order the Orbs</h2>
+        <h2>{config.name}</h2>
         <p>Tap the expressions from smallest answer to largest.</p>
+        {config.isBoss && (
+          <p className="boss-label">★ BOSS CHALLENGE ★</p>
+        )}
       </div>
 
       <div className="challenge-stats">
@@ -127,13 +175,22 @@ export default function ChallengeView({
         <div className="stat-card">
           <span className="stat-label">ROUND</span>
           <strong>
-            {Math.min(challenge.roundIndex + 1, TOTAL_ROUNDS)}/{TOTAL_ROUNDS}
+            {Math.min(challenge.roundIndex + 1, challenge.totalRounds)}/
+            {challenge.totalRounds}
+          </strong>
+        </div>
+
+        <div className="stat-card">
+          <span className="stat-label">LIVES</span>
+          <strong aria-label={`${challenge.lives} lives remaining`}>
+            {"❤️".repeat(challenge.lives)}
+            {"🖤".repeat(config.startingLives - challenge.lives)}
           </strong>
         </div>
       </div>
 
-      {challenge.status === "playing" ||
-      challenge.status === "feedback" ? (
+      {(challenge.status === "playing" ||
+        challenge.status === "feedback") && (
         <div className="bubble-grid">
           {challenge.currentRound.map((bubble) => {
             const selected = challenge.selectedIds.includes(bubble.id);
@@ -146,10 +203,8 @@ export default function ChallengeView({
 
             if (selected) bubbleClass += " bubble-selected";
             if (isWrong) bubbleClass += " bubble-wrong";
-            if (
-              challenge.status === "feedback" &&
-              isCorrectFeedback
-            ) {
+
+            if (challenge.status === "feedback" && isCorrectFeedback) {
               bubbleClass += " bubble-correct";
             }
 
@@ -157,20 +212,16 @@ export default function ChallengeView({
               <button
                 key={bubble.id}
                 className={bubbleClass}
-                disabled={
-                  challenge.status !== "playing" || selected
-                }
+                disabled={challenge.status !== "playing" || selected}
                 onClick={() => handleBubbleClick(bubble.id)}
               >
                 <span className="bubble-expression">{bubble.text}</span>
-                {selected && (
-                  <span className="bubble-check">✓</span>
-                )}
+                {selected && <span className="bubble-check">✓</span>}
               </button>
             );
           })}
         </div>
-      ) : null}
+      )}
 
       {challenge.status === "playing" && (
         <p className="challenge-hint">
@@ -180,7 +231,8 @@ export default function ChallengeView({
 
       {challenge.status === "feedback" && (
         <p className="challenge-message">
-          Not quite! The green orb shows the correct next choice.
+          Incorrect! You have {challenge.lives}{" "}
+          {challenge.lives === 1 ? "life" : "lives"} remaining.
         </p>
       )}
 
@@ -190,12 +242,12 @@ export default function ChallengeView({
           <h3>
             {challenge.failureReason === "timeout"
               ? "Time's up!"
-              : "Not quite!"}
+              : "Out of lives!"}
           </h3>
           <p>
             {challenge.failureReason === "timeout"
               ? "You ran out of time. Give it another shot!"
-              : "One wrong click ended this attempt. You can try again."}
+              : "You've used all your lives. Try again!"}
           </p>
           <button className="primary-button" onClick={retryChallenge}>
             Try again
@@ -203,14 +255,6 @@ export default function ChallengeView({
           <button className="back-button" onClick={onExit}>
             Back to rooms
           </button>
-        </div>
-      )}
-
-      {challenge.status === "success" && (
-        <div className="challenge-result">
-          <div className="result-icon">🏆</div>
-          <h3>Room conquered!</h3>
-          <p>You ordered every orb correctly in time.</p>
         </div>
       )}
     </section>

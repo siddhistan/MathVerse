@@ -66,14 +66,28 @@ describe("challengeEngine", () => {
     expect(state.failureReason).toBe("wrong-answer");
   });
 
-  it("fails after the feedback is finished", () => {
-    let state = createChallenge(makeRound([3, 1, 2]));
-    state = selectBubble(state, "bubble-0");
-    state = finishFailureFeedback(state);
+  
+it("continues after feedback when lives remain", () => {
+  let state = createChallenge(makeRound([3,1,2]));
 
-    expect(state.status).toBe("failed");
-    expect(state.feedback).toBeNull();
-  });
+  const wrongBubble = state.currentRound.find(
+    (bubble) =>
+      bubble.id !==
+      [...state.currentRound].sort((a, b) => a.value - b.value)[0].id,
+  )!;
+
+  state = selectBubble(state, wrongBubble.id);
+
+  expect(state.status).toBe("feedback");
+  expect(state.lives).toBe(2);
+
+  state = finishFailureFeedback(state);
+
+  expect(state.status).toBe("playing");
+  expect(state.feedback).toBeNull();
+  expect(state.lives).toBe(2);
+});
+
 
   it("fails when the timer expires", () => {
     const state = failOnTimeout(createChallenge(makeRound([3, 1, 2])));
