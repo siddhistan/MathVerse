@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import MissingNumberView from "./MissingNumberView";
 import {
   createChallenge,
   failOnTimeout,
@@ -36,6 +37,17 @@ export default function ChallengeView({
           ← Back to rooms
         </button>
       </section>
+    );
+  }
+
+   if (config.puzzleType === "missing-number") {
+    return (
+      <MissingNumberView
+        floor={floor}
+        room={room}
+        onComplete={onComplete}
+        onExit={onExit}
+      />
     );
   }
 
